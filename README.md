@@ -30,7 +30,7 @@ this is how it looks right now :
 
 ### release wise new features
 
-`0.0.1`
+[`0.0.1`](https://github.com/aquaticcalf/obsidian-btw/releases/tag/0.0.1)
 - [x] terminal
 - [x] tabs for terminal
 - [x] made sure nvim and opencode work
