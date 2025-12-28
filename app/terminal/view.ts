@@ -275,7 +275,7 @@ class NodePtySetupModal extends Modal {
       text: "this terminal view needs the native node-pty module. install it in the plugin folder to enable the terminal.",
     })
 
-    const codeEl = contentEl.createEl("code", { text: this.installCmd, cls: "node-pty-setup-code" })
+    contentEl.createEl("code", { text: this.installCmd, cls: "node-pty-setup-code" })
 
     const buttons = contentEl.createDiv({ cls: "node-pty-setup-buttons" })
 
@@ -301,7 +301,11 @@ class NodePtySetupModal extends Modal {
     })
 
     whyBtn.onclick = () => {
-      whyEl.hasClass("show") ? whyEl.removeClass("show") : whyEl.addClass("show")
+      if (whyEl.hasClass("show")) {
+        whyEl.removeClass("show")
+      } else {
+        whyEl.addClass("show")
+      }
     }
 
     this.checkInterval = setInterval(() => {
