@@ -58,7 +58,9 @@ export function patchNewTabButtons(
     }
 
     button.addEventListener("click", handler, { capture: true })
-    disposables.push(() => button.removeEventListener("click", handler, { capture: true as boolean }))
+    disposables.push(() =>
+      button.removeEventListener("click", handler, { capture: true as boolean }),
+    )
   }
 
   return {
