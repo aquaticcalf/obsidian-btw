@@ -16,7 +16,7 @@ export default class ObsidianBTW extends Plugin {
 
     this.addCommand({
       id: "new-terminal",
-      name: "New Terminal",
+      name: "New terminal",
       callback: () => this.createTerminal(),
     })
 
