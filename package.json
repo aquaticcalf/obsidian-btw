@@ -10,7 +10,8 @@
     "build": "bun run build.ts",
     "typecheck": "tsc --noEmit",
     "fix": "oxfmt app build.ts release.ts --write && oxlint app build.ts release.ts --fix",
-    "release": "bun run release.ts"
+    "release": "bun run release.ts",
+    "prepare": "husky"
   },
   "dependencies": {
     "@xterm/addon-fit": "0.10.0",
@@ -23,6 +24,7 @@
     "@types/bun": "latest",
     "@types/node": "^25.0.3",
     "electron-rebuild": "^3.2.9",
+    "husky": "^9.1.7",
     "oxfmt": "^0.20.0",
     "oxlint": "^1.35.0",
     "typescript": "^5.0.0"
