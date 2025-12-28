@@ -64,31 +64,18 @@ export class TerminalView extends ItemView {
     const container = this.contentEl
     container.empty()
     container.addClass("obsidian-btw-terminal-container")
-    container.style.backgroundColor = "var(--background-primary)"
-    container.style.overflow = "hidden"
-    container.style.display = "flex"
-    container.style.flexDirection = "column"
-    container.style.height = "100%"
 
     const parent = container.parentElement
     if (parent) {
-      parent.style.overflow = "hidden"
-      parent.style.padding = "0"
-      parent.style.margin = "0"
-      parent.style.boxSizing = "border-box"
+      parent.addClass("workspace-leaf-content")
     }
 
     container.createDiv({ cls: "obsidian-btw-terminal-spacer" })
 
-    const rowDiv = container.createDiv()
-    rowDiv.style.display = "flex"
-    rowDiv.style.flex = "1"
-    rowDiv.style.overflow = "hidden"
-
+    const rowDiv = container.createDiv({ cls: "obsidian-btw-terminal-row" })
     rowDiv.createDiv({ cls: "obsidian-btw-terminal-left-spacer" })
 
-    const terminalDiv = rowDiv.createDiv({ cls: "terminal-wrapper" })
-    terminalDiv.style.flex = "1"
+    rowDiv.createDiv({ cls: "terminal-wrapper" })
   }
 
   private createTerminal(): void {
@@ -288,16 +275,9 @@ class NodePtySetupModal extends Modal {
       text: "this terminal view needs the native node-pty module. install it in the plugin folder to enable the terminal.",
     })
 
-    const codeEl = contentEl.createEl("code", { text: this.installCmd })
-    codeEl.style.display = "block"
-    codeEl.style.padding = "8px 6px"
-    codeEl.style.marginBottom = "12px"
-    codeEl.style.whiteSpace = "pre-wrap"
+    const codeEl = contentEl.createEl("code", { text: this.installCmd, cls: "node-pty-setup-code" })
 
     const buttons = contentEl.createDiv({ cls: "node-pty-setup-buttons" })
-    buttons.style.display = "flex"
-    buttons.style.gap = "8px"
-    buttons.style.marginTop = "12px"
 
     const copyBtn = buttons.createEl("button", { text: "copy command" })
     copyBtn.onclick = async () => {
@@ -311,19 +291,17 @@ class NodePtySetupModal extends Modal {
 
     const whyBtn = buttons.createEl("button", { text: "why?" })
 
-    const whyEl = contentEl.createDiv()
-    whyEl.style.marginTop = "12px"
-    whyEl.style.display = "none"
+    const whyEl = contentEl.createDiv({ cls: "node-pty-setup-why" })
 
     whyEl.createEl("p", {
-      text: "node-pty is a native library that gives the terminal real shell i/o. without it, obsidian can’t talk to your system shell in a proper pseudo-terminal, so this plugin disables the terminal instead of crashing.",
+      text: "node-pty is a native library that gives the terminal real shell i/o. without it, obsidian can't talk to your system shell in a proper pseudo-terminal, so this plugin disables the terminal instead of crashing.",
     })
     whyEl.createEl("p", {
       text: "install node-pty once in the plugin directory and rebuild the native module. after restarting obsidian, the terminal will work.",
     })
 
     whyBtn.onclick = () => {
-      whyEl.style.display = whyEl.style.display === "none" ? "block" : "none"
+      whyEl.hasClass("show") ? whyEl.removeClass("show") : whyEl.addClass("show")
     }
 
     this.checkInterval = setInterval(() => {
