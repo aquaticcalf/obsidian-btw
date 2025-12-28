@@ -30,7 +30,8 @@ export function patchNewTabButtons(
   patchedButtons: WeakSet<HTMLElement>,
   viewType: string,
   onTerminalTabClick: (parent: any) => void,
-): void {
+): { dispose: () => void } {
+  const disposables: (() => void)[] = []
   const buttons = document.querySelectorAll(".workspace-tab-header-new-tab")
 
   for (const btn of Array.from(buttons)) {
@@ -38,26 +39,35 @@ export function patchNewTabButtons(
     if (patchedButtons.has(button)) continue
     patchedButtons.add(button)
 
-    button.addEventListener(
-      "click",
-      (e) => {
-        const tabContainer = button.closest(".workspace-tabs")
-        if (!tabContainer) return
+    const handler = (e: Event) => {
+      const tabContainer = button.closest(".workspace-tabs")
+      if (!tabContainer) return
 
-        const activeLeaf = getActiveLeafInContainer(app, tabContainer as HTMLElement)
+      const activeLeaf = getActiveLeafInContainer(app, tabContainer as HTMLElement)
 
-        if (activeLeaf && activeLeaf.view?.getViewType?.() === viewType) {
-          e.preventDefault()
-          e.stopPropagation()
-          e.stopImmediatePropagation()
+      if (activeLeaf && activeLeaf.view?.getViewType?.() === viewType) {
+        e.preventDefault()
+        e.stopPropagation()
+        e.stopImmediatePropagation()
 
-          const parent = activeLeaf.parent
-          if (parent) {
-            onTerminalTabClick(parent)
-          }
+        const parent = activeLeaf.parent
+        if (parent) {
+          onTerminalTabClick(parent)
         }
-      },
-      { capture: true },
+      }
+    }
+
+    button.addEventListener("click", handler, { capture: true })
+    disposables.push(() =>
+      button.removeEventListener("click", handler, { capture: true as boolean }),
     )
+  }
+
+  return {
+    dispose: () => {
+      for (const dispose of disposables) {
+        dispose()
+      }
+    },
   }
 }

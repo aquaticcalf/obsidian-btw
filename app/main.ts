@@ -4,6 +4,7 @@ import { patchNewTabButtons } from "@/ui/tab-button"
 
 export default class ObsidianBTW extends Plugin {
   private patchedButtons = new WeakSet<HTMLElement>()
+  private buttonPatchDisposable: { dispose: () => void } | null = null
 
   async onload() {
     this.registerView(TERMINAL_VIEW_TYPE, (leaf) => new TerminalView(leaf))
@@ -15,16 +16,29 @@ export default class ObsidianBTW extends Plugin {
 
     this.addCommand({
       id: "new-terminal",
-      name: "New Terminal",
+      name: "New terminal",
       callback: () => this.createTerminal(),
     })
 
     this.registerEvent(this.app.workspace.on("layout-change", () => this.patchButtons()))
   }
 
+  async onunload() {
+    if (this.buttonPatchDisposable) {
+      this.buttonPatchDisposable.dispose()
+      this.buttonPatchDisposable = null
+    }
+  }
+
   private patchButtons(): void {
-    patchNewTabButtons(this.app, this.patchedButtons, TERMINAL_VIEW_TYPE, (parent) =>
-      this.createTerminalInSplit(parent),
+    if (this.buttonPatchDisposable) {
+      this.buttonPatchDisposable.dispose()
+    }
+    this.buttonPatchDisposable = patchNewTabButtons(
+      this.app,
+      this.patchedButtons,
+      TERMINAL_VIEW_TYPE,
+      (parent) => this.createTerminalInSplit(parent),
     )
   }
 
