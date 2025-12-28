@@ -32,10 +32,26 @@
   padding: 0 !important;
   margin: 0 !important;
   overflow: hidden !important;
+  background-color: var(--background-primary);
+  display: flex;
+  flex-direction: column;
+}
+
+.workspace-leaf-content:has(.obsidian-btw-terminal-container) {
+  overflow: hidden;
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
 }
 
 .view-content.obsidian-btw-terminal-container {
   overflow: hidden !important;
+}
+
+.obsidian-btw-terminal-row {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
 }
 
 .terminal-wrapper {
@@ -43,6 +59,7 @@
   width: 100%;
   padding: 0 !important;
   margin: 0 !important;
+  flex: 1;
 }
 
 .terminal-wrapper .xterm {
@@ -70,4 +87,26 @@
 .node-pty-setup-title {
   margin-top: 0;
   margin-bottom: 1em;
+}
+
+.node-pty-setup-code {
+  display: block;
+  padding: 8px 6px;
+  margin-bottom: 12px;
+  white-space: pre-wrap;
+}
+
+.node-pty-setup-buttons {
+  display: flex;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.node-pty-setup-why {
+  margin-top: 12px;
+  display: none;
+}
+
+.node-pty-setup-why.show {
+  display: block;
 }
