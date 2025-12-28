@@ -1,0 +1,101 @@
+name: release from dev
+
+on:
+  push:
+    branches:
+      - dev
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: checkout
+        uses: actions/checkout@v4
+
+      - name: check manifest version vs latest release
+        id: version-check
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const fs = require("fs")
+            const core = require("@actions/core")
+
+            const manifest = JSON.parse(fs.readFileSync("manifest.json", "utf8"))
+            const newVersion = manifest.version
+
+            if (!newVersion) {
+              core.setFailed("manifest.json has no version field, fix that first! >:(")
+              return
+            }
+
+            let latestVersion = "0.0.0"
+
+            try {
+              const { data: latestRelease } = await github.repos.getLatestRelease({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+              })
+              latestVersion = latestRelease.tag_name
+            } catch (error) {
+              if (error.status === 404) {
+                core.info("No previous releases found, treating latestVersion as 0.0.0")
+              } else {
+                throw error
+              }
+            }
+
+            function cmpSemver(a, b) {
+              const pa = String(a).split(".").map(Number)
+              const pb = String(b).split(".").map(Number)
+              const len = Math.max(pa.length, pb.length)
+              for (let i = 0; i < len; i++) {
+                const na = pa[i] ?? 0
+                const nb = pb[i] ?? 0
+                if (na > nb) return 1
+                if (na < nb) return -1
+              }
+              return 0
+            }
+
+            const comparison = cmpSemver(newVersion, latestVersion)
+            const shouldRelease = comparison > 0
+
+            core.info(`manifest version: ${newVersion}`)
+            core.info(`latest release:  ${latestVersion}`)
+            core.info(`comparison:      ${comparison} ( >0 => manifest is newer )`)
+            core.info(`should_release:  ${shouldRelease}`)
+
+            core.setOutput("version", newVersion)
+            core.setOutput("latest", latestVersion)
+            core.setOutput("should_release", shouldRelease ? "true" : "false")
+
+      - name: setup bun
+        if: steps.version-check.outputs.should_release == 'true'
+        uses: oven-sh/setup-bun@v1
+        with:
+          bun-version: latest
+
+      - name: Install dependencies
+        if: steps.version-check.outputs.should_release == 'true'
+        run: bun install
+
+      - name: Build release folder with bun
+        if: steps.version-check.outputs.should_release == 'true'
+        run: bun release
+
+      - name: Create GitHub release and upload assets
+        if: steps.version-check.outputs.should_release == 'true'
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.version-check.outputs.version }}
+          name: ${{ steps.version-check.outputs.version }}
+          generate_release_notes: true
+          files: |
+            release-${{ steps.version-check.outputs.version }}/*
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
