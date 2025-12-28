@@ -6,7 +6,7 @@ on:
       - dev
 
 permissions:
-  contents: write  # needed to create releases/tags
+  contents: write
 
 jobs:
   release:
