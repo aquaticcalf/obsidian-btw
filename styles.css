@@ -83,7 +83,11 @@
   width: 100% !important;
 }
 
-/* NodePtySetupModal styles */
+.node-pty-setup-title {
+  margin-top: 0;
+  margin-bottom: 1em;
+}
+
 .node-pty-setup-code {
   display: block;
   padding: 8px 6px;
