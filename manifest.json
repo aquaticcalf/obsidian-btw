@@ -1,9 +1,9 @@
 {
   "id": "btw",
-  "name": "obsidian, btw!",
+  "name": "by the way",
   "version": "0.0.1",
   "minAppVersion": "1.0.0",
-  "description": "turn your obsidian into an ide!",
+  "description": "turn your vault into an ide!",
   "author": "aquaticcalf",
   "isDesktopOnly": true
 }
