@@ -1,0 +1,9 @@
+{
+  "id": "obsidian-btw",
+  "name": "obsidian, btw!",
+  "version": "0.0.1",
+  "minAppVersion": "1.0.0",
+  "description": "turn your obsidian into an ide",
+  "author": "aquaticcalf",
+  "isDesktopOnly": true
+}

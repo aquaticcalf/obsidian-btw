@@ -1,0 +1,67 @@
+.workspace-leaf:has(.obsidian-btw-terminal-container) .view-header {
+  display: none !important;
+  height: 0 !important;
+  min-height: 0 !important;
+  max-height: 0 !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  border: none !important;
+}
+
+.obsidian-btw-terminal-spacer {
+  height: var(--size-4-2);
+  width: 100%;
+  background-color: transparent;
+}
+
+.obsidian-btw-terminal-left-spacer {
+  width: var(--size-2-3);
+  height: 100%;
+  background-color: transparent;
+}
+
+.workspace-leaf-content:has(.obsidian-btw-terminal-container) {
+  padding: 0 !important;
+  margin: 0 !important;
+  overflow: hidden !important;
+}
+
+.obsidian-btw-terminal-container {
+  height: 100%;
+  width: 100%;
+  padding: 0 !important;
+  margin: 0 !important;
+  overflow: hidden !important;
+}
+
+.view-content.obsidian-btw-terminal-container {
+  overflow: hidden !important;
+}
+
+.terminal-wrapper {
+  height: 100%;
+  width: 100%;
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+.terminal-wrapper .xterm {
+  height: 100%;
+  width: 100%;
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+.terminal-wrapper .xterm-viewport {
+  scrollbar-width: none !important;
+  -ms-overflow-style: none !important;
+}
+
+.terminal-wrapper .xterm-viewport::-webkit-scrollbar {
+  display: none !important;
+}
+
+.terminal-wrapper .xterm-screen {
+  height: 100% !important;
+  width: 100% !important;
+}
