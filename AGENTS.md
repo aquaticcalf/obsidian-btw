@@ -4,7 +4,7 @@ This document describes the workflow used when working with AI agents on this re
 
 ## Overview
 
-We use a **stack-based branching strategy** where we:
+We use a **stack-based branching strategy** where we :
 - Use `dev` as the base branch for all work
 - Create separate, independent branches for each task/fix
 - Branch from `dev` (not from each other)
@@ -14,30 +14,30 @@ We use a **stack-based branching strategy** where we:
 ## Workflow Steps
 
 ### 1. Task Planning
-Before starting work, we:
+Before starting work, we :
 1. Analyze the requirements or issues
 2. Break down work into individual tasks
 3. Assign priority levels (high, medium, low)
 4. Create a task list with clear descriptions
 
 ### 2. Branch Creation
-For each task, we create a new branch:
+For each task, we create a new branch :
 ```bash
 git checkout dev
 git checkout -b <branch-name>
 ```
 
-**Important:** Always branch from `dev`, never from other feature branches.
+**Important :** Always branch from `dev`, never from other feature branches.
 
 ### 3. Implementation & Commit
-Work on the task in the branch and commit:
+Work on the task in the branch and commit :
 ```bash
 # Make changes
 git add -A
 git commit -m "type: descriptive commit message"
 ```
 
-**Commit message format:**
+**Commit message format :**
 - `fix:` - Bug fixes
 - `feat:` - New features
 - `refactor:` - Code refactoring
@@ -46,7 +46,7 @@ git commit -m "type: descriptive commit message"
 - `docs:` - Documentation changes
 
 ### 4. Push & Forget
-After committing, push to origin:
+After committing, push to origin :
 ```bash
 git push -u origin <branch-name>
 ```
@@ -54,13 +54,13 @@ git push -u origin <branch-name>
 Once pushed, **forget about the branch** - move on to the next task. The branch is now ready for review/merge.
 
 ### 5. Return to Base
-Always return to `dev` before starting the next task:
+Always return to `dev` before starting the next task :
 ```bash
 git checkout dev
 ```
 
 ### 6. Merge & Review
-When ready to merge:
+When ready to merge :
 ```bash
 git checkout dev
 git merge <branch-name>
@@ -70,13 +70,13 @@ Or create pull requests for individual review.
 
 ## Branch Naming Conventions
 
-Use descriptive, kebab-case names:
+Use descriptive, kebab-case names :
 - `fix-event-listener-leak`
 - `move-inline-styles-to-css`
 - `add-husky-pre-commit`
 - `docs-agent-workflow`
 
-**Pattern:** `<action>-<description>`
+**Pattern :** `<action>-<description>`
 
 ## Priority-Based Task Management
 
@@ -139,14 +139,14 @@ git checkout dev
 5. **Easy rollback** - Revert individual features without affecting others
 
 ### Branch Independence
-Since all branches come from `dev`:
+Since all branches come from `dev` :
 - No merge conflicts between feature branches
 - Each branch is self-contained
 - Can be reviewed and merged independently
 - Failed branches don't block others
 
 ### Stack Diffs
-This method is similar to "stack diffs":
+This method is similar to "stack diffs" :
 - Build a "stack" of independent changes
 - Each change is a "diff" from base
 - Review and merge changes from the stack
@@ -171,43 +171,9 @@ This method is similar to "stack diffs":
 - Mix different task types in one branch
 - Skip returning to `dev`
 
-## Merging Strategy
+## Example : Obsidian Plugin Compliance
 
-### Option 1: Merge All At Once
-```bash
-git checkout dev
-git merge branch-1
-git merge branch-2
-git merge branch-3
-# ... etc
-```
-
-### Option 2: Pull Requests
-Create PRs for each branch on GitHub for thorough review.
-
-### Option 3: Selective Merge
-Merge only branches that are ready:
-```bash
-git checkout dev
-git merge branch-ready-1
-git merge branch-ready-3
-# Skip branch-2 if it's not ready
-```
-
-## Cleanup
-
-After merging, clean up branches:
-```bash
-# Delete local branches
-git branch -d branch-name
-
-# Delete remote branches
-git push origin --delete branch-name
-```
-
-## Example: Obsidian Plugin Compliance
-
-This workflow was used to fix Obsidian plugin guideline violations:
+This workflow was used to fix Obsidian plugin guideline violations :
 
 1. **fix-event-listener-leak** - Memory leak in tab button patching
 2. **move-inline-styles-to-css** - Moved hardcoded styles to CSS classes
@@ -220,7 +186,7 @@ All branches were created from `dev`, pushed independently, and ready for merge 
 
 ## Summary
 
-- Branch from `dev` → Work → Push → Forget → Return to `dev`
+- Branch from `dev` -> Work -> Push -> Forget -> Return to `dev`
 - Each branch is independent and focused
 - Review and merge in any order
 - Clear task list with priorities
