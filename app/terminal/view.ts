@@ -282,7 +282,7 @@ class NodePtySetupModal extends Modal {
     const { contentEl } = this
     contentEl.empty()
 
-    contentEl.createEl("h2", { text: "terminal setup is incomplete" })
+    contentEl.createEl("h2", { text: "terminal setup is incomplete" }).addClass("node-pty-setup-title")
 
     contentEl.createEl("p", {
       text: "this terminal view needs the native node-pty module. install it in the plugin folder to enable the terminal.",
