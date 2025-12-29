@@ -1,11 +1,13 @@
-import type { App } from "obsidian"
+import type { App, FileSystemAdapter } from "obsidian"
 import path from "path"
 
 export function getPluginDir(app: App): string {
-  const rootPath = app.vault.getRoot().path
-  return path.join(rootPath, app.vault.configDir, "plugins", "obsidian-btw")
+  const adapter = app.vault.adapter as FileSystemAdapter
+  const basePath = adapter.getFullPath("")
+  return path.join(basePath, app.vault.configDir, "plugins", "obsidian-btw")
 }
 
 export function getVaultPath(app: App): string {
-  return app.vault.getRoot().path || process.env.HOME || "/"
+  const adapter = app.vault.adapter as FileSystemAdapter
+  return adapter.getFullPath("") || process.env.HOME || "/"
 }
