@@ -3,14 +3,12 @@ import type { Terminal } from "@xterm/xterm"
 import { DEFAULT_BG, DEFAULT_FG } from "@/terminal/constants"
 
 export interface TerminalTheme {
-  // UI Interaction
   background: string
   foreground: string
   cursor: string
   cursorAccent: string
   selectionBackground: string
 
-  // ANSI 0-7 (Standard)
   black: string
   red: string
   green: string
@@ -20,7 +18,6 @@ export interface TerminalTheme {
   cyan: string
   white: string
 
-  // ANSI 8-15 (Bright/Bold)
   brightBlack: string
   brightRed: string
   brightGreen: string
@@ -31,10 +28,6 @@ export interface TerminalTheme {
   brightWhite: string
 }
 
-/**
- * ThemeManager handles color extraction, contrast calculation, and dynamic adjustment
- * to ensure WCAG AA compliance (4.5:1 contrast ratio)
- */
 class ThemeManager {
   private root: HTMLElement
 
@@ -42,23 +35,17 @@ class ThemeManager {
     this.root = document.body || document.documentElement
   }
 
-  /**
-   * Extract RGB values from CSS variable (--color-*-rgb format)
-   * Returns [r, g, b] normalized to 0-1 range, or null if not found
-   */
   private getRgbFromVar(varName: string): [number, number, number] | null {
     try {
       const styles = getComputedStyle(this.root)
       const value = styles.getPropertyValue(varName).trim()
       if (!value) return null
 
-      // Handle RGB format: "255, 0, 0" or "255 0 0"
       const parts = value.split(/[,\s]+/).map((p) => Number.parseInt(p.trim(), 10))
       if (parts.length >= 3 && parts.every((p) => !Number.isNaN(p))) {
         return [parts[0] / 255, parts[1] / 255, parts[2] / 255]
       }
 
-      // Handle hex format: "#ff0000" or "ff0000"
       const hex = value.replace("#", "")
       if (hex.length === 6) {
         const r = Number.parseInt(hex.substring(0, 2), 16) / 255
@@ -73,21 +60,16 @@ class ThemeManager {
     }
   }
 
-  /**
-   * Extract color from CSS variable, trying both RGB and standard formats
-   */
   private getColorFromVar(varName: string, fallback: string): string {
     try {
       const styles = getComputedStyle(this.root)
 
-      // Try RGB variant first (more efficient)
       const rgb = this.getRgbFromVar(`${varName}-rgb`)
       if (rgb) {
         const [r, g, b] = rgb
         return this.rgbToHex(Math.round(r * 255), Math.round(g * 255), Math.round(b * 255))
       }
 
-      // Fall back to standard variable
       const value = styles.getPropertyValue(varName).trim()
       if (value) return value
 
@@ -97,21 +79,14 @@ class ThemeManager {
     }
   }
 
-  /**
-   * Calculate perceived luminance using WCAG formula
-   * L = 0.2126*R + 0.7152*G + 0.0722*B
-   */
+  // https://www.w3.org/WAI/GL/wiki/Relative_luminance
   private calculateLuminance(rgb: [number, number, number]): number {
     const [r, g, b] = rgb.map((val) => {
-      // Apply gamma correction
       return val <= 0.03928 ? val / 12.92 : ((val + 0.055) / 1.055) ** 2.4
     })
     return 0.2126 * r + 0.7152 * g + 0.0722 * b
   }
 
-  /**
-   * Calculate contrast ratio between two colors
-   */
   private calculateContrastRatio(
     rgb1: [number, number, number],
     rgb2: [number, number, number],
@@ -123,16 +98,10 @@ class ThemeManager {
     return (lighter + 0.05) / (darker + 0.05)
   }
 
-  /**
-   * Convert RGB to hex string
-   */
   private rgbToHex(r: number, g: number, b: number): string {
     return `#${[r, g, b].map((x) => x.toString(16).padStart(2, "0")).join("")}`
   }
 
-  /**
-   * Adjust color brightness to meet WCAG AA contrast ratio (4.5:1)
-   */
   private adjustColorForContrast(
     colorRgb: [number, number, number],
     bgRgb: [number, number, number],
@@ -141,16 +110,13 @@ class ThemeManager {
     const currentRatio = this.calculateContrastRatio(colorRgb, bgRgb)
 
     if (currentRatio >= targetRatio) {
-      // Already meets contrast requirements
       const [r, g, b] = colorRgb
       return this.rgbToHex(Math.round(r * 255), Math.round(g * 255), Math.round(b * 255))
     }
 
-    // Determine if we need to lighten or darken
     const bgLuminance = this.calculateLuminance(bgRgb)
     const shouldLighten = bgLuminance < 0.5
 
-    // Binary search for the right adjustment
     let [r, g, b] = colorRgb
     let factor = shouldLighten ? 1.5 : 0.5
     let step = shouldLighten ? 0.5 : 0.25
@@ -165,7 +131,6 @@ class ThemeManager {
       const ratio = this.calculateContrastRatio(adjusted, bgRgb)
 
       if (Math.abs(ratio - targetRatio) < 0.1) {
-        // Close enough
         return this.rgbToHex(
           Math.round(adjusted[0] * 255),
           Math.round(adjusted[1] * 255),
@@ -183,16 +148,12 @@ class ThemeManager {
       iterations++
     }
 
-    // Fallback to extreme values if we can't find a good adjustment
     if (shouldLighten) {
       return "#ffffff"
     }
     return "#000000"
   }
 
-  /**
-   * Get a color with guaranteed contrast against background
-   */
   private getContrastColor(
     varName: string,
     fallback: string,
@@ -214,9 +175,7 @@ class ThemeManager {
     return fallback
   }
 
-  /**
-   * Extract the complete terminal theme from Obsidian's CSS variables
-   */
+
   getTheme(): TerminalTheme {
     try {
       const background = this.getColorFromVar("--background-primary", DEFAULT_BG)
