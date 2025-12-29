@@ -195,14 +195,9 @@ export class TerminalView extends ItemView {
 
     this.registerEvent(this.app.workspace.on("css-change", () => this.applyTheme()))
 
-    // Setup MutationObserver for reactive theme changes
     this.setupThemeObserver()
   }
 
-  /**
-   * Setup MutationObserver to watch for theme changes
-   * Monitors .theme-dark, .theme-light class changes and style attribute changes
-   */
   private setupThemeObserver(): void {
     if (this.themeObserver) return
 
@@ -212,7 +207,6 @@ export class TerminalView extends ItemView {
       for (const mutation of mutations) {
         if (mutation.type === "attributes") {
           const attrName = mutation.attributeName
-          // Watch for class changes (theme-dark/theme-light) or style changes
           if (attrName === "class" || attrName === "style") {
             this.applyTheme()
             break
