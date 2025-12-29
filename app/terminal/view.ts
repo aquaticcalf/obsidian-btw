@@ -27,6 +27,7 @@ export class TerminalView extends ItemView {
   private webglAddon: WebglAddon | null = null
   private ptyDataDisposable: { dispose: () => void } | null = null
   private resizeObserver: ResizeObserver | null = null
+  private themeObserver: MutationObserver | null = null
   private currentTitle = "Terminal"
   private checkInterval: any = null
 
@@ -193,6 +194,38 @@ export class TerminalView extends ItemView {
     this.registerEvent(this.app.workspace.on("resize", () => this.fit()))
 
     this.registerEvent(this.app.workspace.on("css-change", () => this.applyTheme()))
+
+    // Setup MutationObserver for reactive theme changes
+    this.setupThemeObserver()
+  }
+
+  /**
+   * Setup MutationObserver to watch for theme changes
+   * Monitors .theme-dark, .theme-light class changes and style attribute changes
+   */
+  private setupThemeObserver(): void {
+    if (this.themeObserver) return
+
+    const targetNode = document.body
+
+    const callback = (mutations: MutationRecord[]) => {
+      for (const mutation of mutations) {
+        if (mutation.type === "attributes") {
+          const attrName = mutation.attributeName
+          // Watch for class changes (theme-dark/theme-light) or style changes
+          if (attrName === "class" || attrName === "style") {
+            this.applyTheme()
+            break
+          }
+        }
+      }
+    }
+
+    this.themeObserver = new MutationObserver(callback)
+    this.themeObserver.observe(targetNode, {
+      attributes: true,
+      attributeFilter: ["class", "style"],
+    })
   }
 
   private fit(): void {
@@ -220,6 +253,13 @@ export class TerminalView extends ItemView {
         this.resizeObserver.disconnect()
       } catch {}
       this.resizeObserver = null
+    }
+
+    if (this.themeObserver) {
+      try {
+        this.themeObserver.disconnect()
+      } catch {}
+      this.themeObserver = null
     }
 
     if (this.ptyDataDisposable) {
