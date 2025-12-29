@@ -203,7 +203,6 @@ class ThemeManager {
       return this.adjustColorForContrast(rgb, bgRgb)
     }
 
-    // Try to parse the fallback
     const hex = fallback.replace("#", "")
     if (hex.length === 6) {
       const r = Number.parseInt(hex.substring(0, 2), 16) / 255
@@ -220,15 +219,12 @@ class ThemeManager {
    */
   getTheme(): TerminalTheme {
     try {
-      // Extract base colors
       const background = this.getColorFromVar("--background-primary", DEFAULT_BG)
       const foreground = this.getColorFromVar("--text-normal", DEFAULT_FG)
       const cursor = this.getColorFromVar("--text-accent", foreground)
 
-      // Get background RGB for contrast calculations
       const bgRgb = this.getRgbFromVar("--background-primary-rgb") || [0.12, 0.12, 0.12]
 
-      // Extract ANSI colors with contrast adjustment
       const red = this.getContrastColor("--color-red", "#ff5555", bgRgb)
       const orange = this.getContrastColor("--color-orange", "#ffb86c", bgRgb)
       const yellow = this.getContrastColor("--color-yellow", "#f1fa8c", bgRgb)
@@ -238,23 +234,19 @@ class ThemeManager {
       const purple = this.getContrastColor("--color-purple", "#bd93f9", bgRgb)
       const pink = this.getContrastColor("--color-pink", "#ff79c6", bgRgb)
 
-      // Grayscale colors
       const mono100 = this.getColorFromVar("--mono-rgb-100", "#282a36")
       const mono200 = this.getColorFromVar("--mono-rgb-200", "#44475a")
       const mono255 = this.getColorFromVar("--text-faint", "#f8f8f2")
 
-      // Selection background
       const selectionBg = this.getColorFromVar("--text-selection", "rgba(68, 71, 90, 0.5)")
 
       return {
-        // UI Interaction
         background,
         foreground,
         cursor,
-        cursorAccent: background, // Character color inside cursor block
+        cursorAccent: background,
         selectionBackground: selectionBg,
 
-        // ANSI 0-7 (Standard)
         black: mono100,
         red,
         green,
@@ -264,25 +256,20 @@ class ThemeManager {
         cyan,
         white: foreground,
 
-        // ANSI 8-15 (Bright/Bold)
         brightBlack: mono200,
         brightRed: red,
         brightGreen: green,
-        brightYellow: orange, // Use orange for bright yellow
+        brightYellow: orange,
         brightBlue: blue,
         brightMagenta: pink,
         brightCyan: cyan,
         brightWhite: mono255,
       }
     } catch (error) {
-      console.warn("[obsidian-btw] failed to extract theme:", error)
       return this.getFallbackTheme()
     }
   }
 
-  /**
-   * Get a fallback theme when extraction fails
-   */
   private getFallbackTheme(): TerminalTheme {
     return {
       background: DEFAULT_BG,
