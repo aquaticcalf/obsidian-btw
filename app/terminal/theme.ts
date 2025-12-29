@@ -258,7 +258,7 @@ class ThemeManager {
         black: mono100,
         red,
         green,
-        yellow: orange, // Using orange for yellow
+        yellow,
         blue,
         magenta: purple,
         cyan,
@@ -268,7 +268,7 @@ class ThemeManager {
         brightBlack: mono200,
         brightRed: red,
         brightGreen: green,
-        brightYellow: yellow,
+        brightYellow: orange, // Use orange for bright yellow
         brightBlue: blue,
         brightMagenta: pink,
         brightCyan: cyan,
