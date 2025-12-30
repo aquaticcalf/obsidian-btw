@@ -27,16 +27,15 @@ export function getActiveLeafInContainer(
 
 export function patchNewTabButtons(
   app: App,
-  patchedButtons: WeakSet<HTMLElement>,
   viewType: string,
   onTerminalTabClick: (parent: any) => void,
 ): { dispose: () => void } {
+  const patchedButtons = new WeakSet<HTMLElement>()
   const disposables: (() => void)[] = []
-  const buttons = document.querySelectorAll(".workspace-tab-header-new-tab")
 
-  for (const btn of Array.from(buttons)) {
-    const button = btn as HTMLElement
-    if (patchedButtons.has(button)) continue
+  function patchButton(button: HTMLElement): void {
+    if (patchedButtons.has(button)) return
+    
     patchedButtons.add(button)
 
     const handler = (e: Event) => {
@@ -62,6 +61,44 @@ export function patchNewTabButtons(
       button.removeEventListener("click", handler, { capture: true as boolean }),
     )
   }
+
+  // Patch all existing buttons
+  const existingButtons = document.querySelectorAll(".workspace-tab-header-new-tab")
+  for (const btn of Array.from(existingButtons)) {
+    patchButton(btn as HTMLElement)
+  }
+
+  // Set up MutationObserver to patch new buttons as they're added
+  const observer = new MutationObserver((mutations) => {
+    for (const mutation of mutations) {
+      const addedNodesArray = Array.from(mutation.addedNodes)
+      for (let i = 0; i < addedNodesArray.length; i++) {
+        const node = addedNodesArray[i]
+        if (node instanceof HTMLElement) {
+          // Check if the added node is a button
+          if (node.matches(".workspace-tab-header-new-tab")) {
+            patchButton(node)
+          }
+          // Check for buttons within the added subtree
+          const nestedButtons = node.querySelectorAll?.(".workspace-tab-header-new-tab")
+          if (nestedButtons) {
+            const buttonsArray = Array.from(nestedButtons)
+            for (let i = 0; i < buttonsArray.length; i++) {
+              patchButton(buttonsArray[i] as HTMLElement)
+            }
+          }
+        }
+      }
+    }
+  })
+
+  // Observe the entire document for new button elements
+  observer.observe(document.body, {
+    childList: true,
+    subtree: true,
+  })
+
+  disposables.push(() => observer.disconnect())
 
   return {
     dispose: () => {

@@ -3,7 +3,6 @@ import { TERMINAL_VIEW_TYPE, TerminalView } from "@/terminal"
 import { patchNewTabButtons } from "@/ui/tab-button"
 
 export default class ObsidianBTW extends Plugin {
-  private patchedButtons = new WeakSet<HTMLElement>()
   private buttonPatchDisposable: { dispose: () => void } | null = null
 
   async onload() {
@@ -20,7 +19,7 @@ export default class ObsidianBTW extends Plugin {
       callback: () => this.createTerminal(),
     })
 
-    this.registerEvent(this.app.workspace.on("layout-change", () => this.patchButtons()))
+    // No longer need layout-change listener - MutationObserver handles button patching
   }
 
   async onunload() {
@@ -36,7 +35,6 @@ export default class ObsidianBTW extends Plugin {
     }
     this.buttonPatchDisposable = patchNewTabButtons(
       this.app,
-      this.patchedButtons,
       TERMINAL_VIEW_TYPE,
       (parent) => this.createTerminalInSplit(parent),
     )
