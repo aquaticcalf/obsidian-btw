@@ -35,7 +35,7 @@ export function patchNewTabButtons(
 
   function patchButton(button: HTMLElement): void {
     if (patchedButtons.has(button)) return
-    
+
     patchedButtons.add(button)
 
     const handler = (e: Event) => {

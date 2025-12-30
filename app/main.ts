@@ -33,10 +33,8 @@ export default class ObsidianBTW extends Plugin {
     if (this.buttonPatchDisposable) {
       this.buttonPatchDisposable.dispose()
     }
-    this.buttonPatchDisposable = patchNewTabButtons(
-      this.app,
-      TERMINAL_VIEW_TYPE,
-      (parent) => this.createTerminalInSplit(parent),
+    this.buttonPatchDisposable = patchNewTabButtons(this.app, TERMINAL_VIEW_TYPE, (parent) =>
+      this.createTerminalInSplit(parent),
     )
   }
 
