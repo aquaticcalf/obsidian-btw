@@ -20,7 +20,12 @@ export default class ObsidianBTW extends Plugin {
       callback: () => this.createTerminal(),
     })
 
-    this.registerEvent(this.app.workspace.on("layout-change", () => this.patchButtons()))
+    this.registerEvent(
+      this.app.workspace.on("layout-change", () => {
+        console.log("[main] layout-change event fired")
+        this.patchButtons()
+      }),
+    )
   }
 
   async onunload() {
@@ -31,9 +36,12 @@ export default class ObsidianBTW extends Plugin {
   }
 
   private patchButtons(): void {
+    console.log("[main] patchButtons called")
     if (this.buttonPatchDisposable) {
+      console.log("[main] Disposing existing listeners")
       this.buttonPatchDisposable.dispose()
     }
+    console.log("[main] Patching buttons")
     this.buttonPatchDisposable = patchNewTabButtons(
       this.app,
       this.patchedButtons,

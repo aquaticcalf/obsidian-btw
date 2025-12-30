@@ -34,18 +34,39 @@ export function patchNewTabButtons(
   const disposables: (() => void)[] = []
   const buttons = document.querySelectorAll(".workspace-tab-header-new-tab")
 
+  console.log("[tab-button] patchNewTabButtons called")
+  console.log("[tab-button] Found buttons:", buttons.length)
+
   for (const btn of Array.from(buttons)) {
     const button = btn as HTMLElement
-    if (patchedButtons.has(button)) continue
+    if (patchedButtons.has(button)) {
+      console.log("[tab-button] Button already patched, skipping:", button)
+      continue
+    }
+    console.log("[tab-button] Patching new button:", button)
     patchedButtons.add(button)
 
     const handler = (e: Event) => {
+      console.log("[tab-button] Click handler fired on button:", button)
+      console.log("[tab-button] Event target:", e.target)
+      console.log("[tab-button] Current target:", e.currentTarget)
+
       const tabContainer = button.closest(".workspace-tabs")
+      console.log("[tab-button] Tab container found:", !!tabContainer)
+
       if (!tabContainer) return
 
       const activeLeaf = getActiveLeafInContainer(app, tabContainer as HTMLElement)
+      console.log("[tab-button] Active leaf found:", !!activeLeaf)
+      console.log("[tab-button] Active leaf view type:", activeLeaf?.view?.getViewType?.())
+      console.log("[tab-button] Target view type:", viewType)
+      console.log(
+        "[tab-button] Match:",
+        activeLeaf && activeLeaf.view?.getViewType?.() === viewType,
+      )
 
       if (activeLeaf && activeLeaf.view?.getViewType?.() === viewType) {
+        console.log("[tab-button] Handling click - creating terminal split")
         e.preventDefault()
         e.stopPropagation()
         e.stopImmediatePropagation()
@@ -54,6 +75,8 @@ export function patchNewTabButtons(
         if (parent) {
           onTerminalTabClick(parent)
         }
+      } else {
+        console.log("[tab-button] Not handling click - not in terminal view")
       }
     }
 

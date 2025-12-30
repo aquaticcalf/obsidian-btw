@@ -175,7 +175,6 @@ class ThemeManager {
     return fallback
   }
 
-
   getTheme(): TerminalTheme {
     try {
       const background = this.getColorFromVar("--background-primary", DEFAULT_BG)
