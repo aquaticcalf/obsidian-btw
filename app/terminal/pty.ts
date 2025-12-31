@@ -26,7 +26,7 @@ export class NodePtyNotFoundError extends Error {
 
 export function isNodePtyAvailable(pluginDir: string): boolean {
   try {
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    // eslint-disable-next-line @typescript-eslint/no-require-imports -- Node-pty must be required dynamically from the plugin directory.
     require(path.join(pluginDir, "node_modules", "node-pty"))
     return true
   } catch {
@@ -40,7 +40,7 @@ function loadNodePty(pluginDir: string): unknown {
   if (nodePty) return nodePty
 
   try {
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    // eslint-disable-next-line @typescript-eslint/no-require-imports -- Node-pty must be required dynamically from the plugin directory.
     nodePty = require(path.join(pluginDir, "node_modules", "node-pty"))
   } catch (err: unknown) {
     const isModuleNotFound =

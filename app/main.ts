@@ -1,4 +1,4 @@
-import { Plugin } from "obsidian"
+import { Plugin, type WorkspaceSplit } from "obsidian"
 import { TERMINAL_VIEW_TYPE, TerminalView } from "@/terminal"
 import { patchNewTabButtons } from "@/ui/tab-button"
 
@@ -7,6 +7,7 @@ export default class ObsidianBTW extends Plugin {
   private buttonPatchDisposable: { dispose: () => void } | null = null
 
   async onload() {
+    await Promise.resolve()
     this.registerView(TERMINAL_VIEW_TYPE, (leaf) => new TerminalView(leaf))
 
     this.app.workspace.onLayoutReady(async () => {
@@ -41,12 +42,12 @@ export default class ObsidianBTW extends Plugin {
       this.patchedButtons,
       TERMINAL_VIEW_TYPE,
       (parent) => {
-        void this.createTerminalInSplit(parent)
+        void this.createTerminalInSplit(parent as import("obsidian").WorkspaceSplit)
       },
     )
   }
 
-  private async createTerminalInSplit(parent: unknown): Promise<void> {
+  private async createTerminalInSplit(parent: WorkspaceSplit): Promise<void> {
     const leaf = this.app.workspace.createLeafInParent(parent, -1)
     await leaf.setViewState({ type: TERMINAL_VIEW_TYPE, active: true })
     await this.app.workspace.revealLeaf(leaf)

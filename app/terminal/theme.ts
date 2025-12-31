@@ -262,14 +262,14 @@ export function getObsidianTheme(): TerminalTheme {
 
 export function applyTheme(
   terminal: Terminal,
-  theme: TerminalTheme,
+  theme: unknown,
   webglAddon: WebglAddon | null,
   WebglAddonClass: typeof WebglAddon,
 ): WebglAddon | null {
   try {
     const opts = terminal.options as unknown as { theme?: object }
     const existingTheme = opts.theme ?? {}
-    opts.theme = { ...existingTheme, ...theme }
+    opts.theme = { ...existingTheme, ...(theme as unknown as object) }
   } catch (e) {
     console.warn("[obsidian-btw] failed to update terminal theme : ", e)
   }

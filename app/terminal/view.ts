@@ -50,6 +50,7 @@ export class TerminalView extends ItemView {
   }
 
   async onOpen() {
+    await Promise.resolve()
     injectTerminalCss()
     this.setupContainer()
     this.createTerminal()
@@ -58,6 +59,7 @@ export class TerminalView extends ItemView {
   }
 
   async onClose() {
+    await Promise.resolve()
     this.dispose()
   }
 
@@ -97,7 +99,8 @@ export class TerminalView extends ItemView {
       cursorBlink: true,
       fontSize: DEFAULT_FONT_SIZE,
       fontFamily: DEFAULT_FONT,
-      theme: theme as unknown,
+      // Cast our TerminalTheme to the xterm theme type used by Terminal options.
+      theme: theme as unknown as import("@xterm/xterm").ITheme,
       allowProposedApi: true,
       scrollback: DEFAULT_SCROLLBACK,
       overviewRulerWidth: 0,
@@ -130,7 +133,9 @@ export class TerminalView extends ItemView {
         }
       }
 
-      const headerEl = (this.leaf as unknown).tabHeaderInnerTitleEl as HTMLElement | undefined
+      const headerEl = (
+        this.leaf as WorkspaceLeaf & { tabHeaderInnerTitleEl?: HTMLElement | undefined }
+      ).tabHeaderInnerTitleEl
       if (headerEl) {
         headerEl.setText(this.currentTitle)
       }
@@ -183,8 +188,10 @@ export class TerminalView extends ItemView {
     if (this.checkInterval) clearInterval(this.checkInterval)
     this.checkInterval = setInterval(() => {
       if (isNodePtyAvailable(getPluginDir(this.app)) && !this.pty) {
-        clearInterval(this.checkInterval)
-        this.checkInterval = null
+        if (this.checkInterval) {
+          clearInterval(this.checkInterval as unknown as number)
+          this.checkInterval = null
+        }
         this.spawnShell()
       }
     }, 500)
@@ -233,7 +240,12 @@ export class TerminalView extends ItemView {
   private applyTheme(): void {
     if (!this.terminal) return
     const theme = getObsidianTheme()
-    this.webglAddon = applyTheme(this.terminal, theme, this.webglAddon, WebglAddon)
+    this.webglAddon = applyTheme(
+      this.terminal,
+      theme as unknown as import("@xterm/xterm").ITheme,
+      this.webglAddon,
+      WebglAddon,
+    )
 
     const wrapper = this.contentEl.querySelector(".terminal-wrapper") as HTMLElement
     if (wrapper) {
@@ -358,7 +370,7 @@ class NodePtySetupModal extends Modal {
       const pluginDir = getPluginDir(this.app)
       const ptyPath = path.join(pluginDir, "node_modules", "node-pty")
       try {
-        // eslint-disable-next-line @typescript-eslint/no-require-imports
+        // eslint-disable-next-line @typescript-eslint/no-require-imports -- Check if node-pty is installed without bundling it.
         require(ptyPath)
         new Notice("Node-pty installed. Please restart Obsidian to use the terminal.")
         this.close()
