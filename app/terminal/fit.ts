@@ -11,7 +11,13 @@ export function fitToContainer(
   pty: PtyProcess | null,
   containerEl: HTMLElement,
 ): FitResult | null {
-  const core = (terminal as any)._core
+  const core = (
+    terminal as unknown as {
+      _core: {
+        _renderService: { dimensions: { css: { cell: { width: number; height: number } } } }
+      }
+    }
+  )._core
   const dims = core?._renderService?.dimensions
   if (!dims?.css?.cell.width || !dims?.css?.cell.height) return null
 

@@ -9,21 +9,23 @@ export default class ObsidianBTW extends Plugin {
   async onload() {
     this.registerView(TERMINAL_VIEW_TYPE, (leaf) => new TerminalView(leaf))
 
-    this.app.workspace.onLayoutReady(() => {
-      this.openTerminal()
+    this.app.workspace.onLayoutReady(async () => {
+      await this.openTerminal()
       this.patchButtons()
     })
 
     this.addCommand({
       id: "new-terminal",
       name: "New terminal",
-      callback: () => this.createTerminal(),
+      callback: () => {
+        void this.createTerminal()
+      },
     })
 
     this.registerEvent(this.app.workspace.on("layout-change", () => this.patchButtons()))
   }
 
-  async onunload() {
+  onunload(): void {
     if (this.buttonPatchDisposable) {
       this.buttonPatchDisposable.dispose()
       this.buttonPatchDisposable = null
@@ -38,14 +40,16 @@ export default class ObsidianBTW extends Plugin {
       this.app,
       this.patchedButtons,
       TERMINAL_VIEW_TYPE,
-      (parent) => this.createTerminalInSplit(parent),
+      (parent) => {
+        void this.createTerminalInSplit(parent)
+      },
     )
   }
 
-  private async createTerminalInSplit(parent: any): Promise<void> {
+  private async createTerminalInSplit(parent: unknown): Promise<void> {
     const leaf = this.app.workspace.createLeafInParent(parent, -1)
     await leaf.setViewState({ type: TERMINAL_VIEW_TYPE, active: true })
-    this.app.workspace.revealLeaf(leaf)
+    await this.app.workspace.revealLeaf(leaf)
   }
 
   private async createTerminal(): Promise<void> {
@@ -63,14 +67,14 @@ export default class ObsidianBTW extends Plugin {
     const leaves = this.app.workspace.getLeavesOfType(TERMINAL_VIEW_TYPE)
 
     if (leaves.length > 0) {
-      this.app.workspace.revealLeaf(leaves[0])
+      await this.app.workspace.revealLeaf(leaves[0])
       return
     }
 
     const leaf = this.app.workspace.getLeaf("split", "horizontal")
     if (leaf) {
       await leaf.setViewState({ type: TERMINAL_VIEW_TYPE, active: true })
-      this.app.workspace.revealLeaf(leaf)
+      await this.app.workspace.revealLeaf(leaf)
     }
   }
 }
