@@ -8,7 +8,6 @@ export function injectTerminalCss(): void {
   if (injected) return
   injected = true
 
-  // CSS is provided via imported stylesheet and main styles.css
   void xtermCss
   void DEFAULT_BG
 }
