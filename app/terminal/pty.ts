@@ -26,6 +26,7 @@ export class NodePtyNotFoundError extends Error {
 
 export function isNodePtyAvailable(pluginDir: string): boolean {
   try {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
     require(path.join(pluginDir, "node_modules", "node-pty"))
     return true
   } catch {
@@ -33,29 +34,34 @@ export function isNodePtyAvailable(pluginDir: string): boolean {
   }
 }
 
-let nodePty: any = null
+let nodePty: unknown = null
 
-function loadNodePty(pluginDir: string): any {
+function loadNodePty(pluginDir: string): unknown {
   if (nodePty) return nodePty
 
   try {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
     nodePty = require(path.join(pluginDir, "node_modules", "node-pty"))
-  } catch (err: any) {
+  } catch (err: unknown) {
     const isModuleNotFound =
-      err && typeof err === "object" && (err as any).code === "MODULE_NOT_FOUND"
+      err && typeof err === "object" && (err as { code?: string }).code === "MODULE_NOT_FOUND"
 
     if (isModuleNotFound) {
       throw new NodePtyNotFoundError("node-pty is not installed in this plugin.")
     }
 
-    throw new NodePtyNotFoundError(`failed to load node-pty : ${err?.message ?? String(err)}`)
+    throw new NodePtyNotFoundError(
+      `failed to load node-pty : ${(err as Error)?.message ?? String(err)}`,
+    )
   }
 
   return nodePty
 }
 
 export function spawnPty(opts: PtyOptions): PtyProcess {
-  const pty = loadNodePty(opts.pluginDir)
+  const pty = loadNodePty(opts.pluginDir) as {
+    spawn: (shell: string, args: string[], opts: object) => PtyProcess
+  }
   const shell = os.platform() === "win32" ? "powershell.exe" : process.env.SHELL || "/bin/bash"
 
   return pty.spawn(shell, [], {
@@ -76,7 +82,9 @@ export function killPty(pty: PtyProcess | null): void {
   if (!pty) return
   try {
     pty.kill("SIGKILL")
-  } catch {}
+  } catch {
+    // Ignore errors when killing the PTY
+  }
 }
 
 export function connectPtyToTerminal(pty: PtyProcess, terminal: Terminal): { dispose: () => void } {

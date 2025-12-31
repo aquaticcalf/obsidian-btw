@@ -9,11 +9,21 @@ export function getActiveLeafInContainer(
   app.workspace.iterateAllLeaves((leaf) => {
     if (foundLeaf) return
 
-    const parent = leaf.parent as any
+    type TabParent = {
+      containerEl?: HTMLElement
+      currentTab?: number
+      children?: WorkspaceLeaf[]
+    }
+
+    const parent = leaf.parent as TabParent | null | undefined
     if (!parent?.containerEl) return
 
     if (parent.containerEl === tabContainer || tabContainer.contains(parent.containerEl)) {
-      if (parent.currentTab !== undefined && parent.children) {
+      if (
+        typeof parent.currentTab === "number" &&
+        parent.children &&
+        parent.children[parent.currentTab]
+      ) {
         const currentLeaf = parent.children[parent.currentTab]
         if (currentLeaf === leaf) {
           foundLeaf = leaf
@@ -29,7 +39,7 @@ export function patchNewTabButtons(
   app: App,
   patchedButtons: WeakSet<HTMLElement>,
   viewType: string,
-  onTerminalTabClick: (parent: any) => void,
+  onTerminalTabClick: (parent: unknown) => void,
 ): { dispose: () => void } {
   const disposables: (() => void)[] = []
   const buttons = document.querySelectorAll(".workspace-tab-header-new-tab")

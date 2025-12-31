@@ -175,7 +175,6 @@ class ThemeManager {
     return fallback
   }
 
-
   getTheme(): TerminalTheme {
     try {
       const background = this.getColorFromVar("--background-primary", DEFAULT_BG)
@@ -224,7 +223,7 @@ class ThemeManager {
         brightCyan: cyan,
         brightWhite: mono255,
       }
-    } catch (error) {
+    } catch {
       return this.getFallbackTheme()
     }
   }
@@ -268,8 +267,8 @@ export function applyTheme(
   WebglAddonClass: typeof WebglAddon,
 ): WebglAddon | null {
   try {
-    const opts = terminal.options as any
-    const existingTheme = (opts.theme ?? {}) as any
+    const opts = terminal.options as unknown as { theme?: object }
+    const existingTheme = opts.theme ?? {}
     opts.theme = { ...existingTheme, ...theme }
   } catch (e) {
     console.warn("[obsidian-btw] failed to update terminal theme : ", e)
@@ -279,7 +278,9 @@ export function applyTheme(
   if (webglAddon) {
     try {
       webglAddon.dispose()
-    } catch {}
+    } catch {
+      // Ignore disposal errors
+    }
   }
 
   try {

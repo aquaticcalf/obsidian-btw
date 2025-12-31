@@ -29,7 +29,7 @@ export class TerminalView extends ItemView {
   private resizeObserver: ResizeObserver | null = null
   private themeObserver: MutationObserver | null = null
   private currentTitle = "Terminal"
-  private checkInterval: any = null
+  private checkInterval: NodeJS.Timeout | null = null
 
   navigation = false
 
@@ -97,7 +97,7 @@ export class TerminalView extends ItemView {
       cursorBlink: true,
       fontSize: DEFAULT_FONT_SIZE,
       fontFamily: DEFAULT_FONT,
-      theme: theme as any,
+      theme: theme as unknown,
       allowProposedApi: true,
       scrollback: DEFAULT_SCROLLBACK,
       overviewRulerWidth: 0,
@@ -130,7 +130,7 @@ export class TerminalView extends ItemView {
         }
       }
 
-      const headerEl = (this.leaf as any).tabHeaderInnerTitleEl as HTMLElement | undefined
+      const headerEl = (this.leaf as unknown).tabHeaderInnerTitleEl as HTMLElement | undefined
       if (headerEl) {
         headerEl.setText(this.currentTitle)
       }
@@ -175,7 +175,7 @@ export class TerminalView extends ItemView {
         this.terminal.write("\r\n[node-pty is not installed – opened setup helper]\r\n")
         new NodePtySetupModal(this.app).open()
       } else {
-        this.terminal.write(`failed to spawn terminal: ${err}\r\n`)
+        this.terminal.write(`failed to spawn terminal: ${String(err)}\r\n`)
         console.error(err)
       }
     }
@@ -245,21 +245,27 @@ export class TerminalView extends ItemView {
     if (this.resizeObserver) {
       try {
         this.resizeObserver.disconnect()
-      } catch {}
+      } catch {
+        // Ignore disconnection errors
+      }
       this.resizeObserver = null
     }
 
     if (this.themeObserver) {
       try {
         this.themeObserver.disconnect()
-      } catch {}
+      } catch {
+        // Ignore disconnection errors
+      }
       this.themeObserver = null
     }
 
     if (this.ptyDataDisposable) {
       try {
         this.ptyDataDisposable.dispose()
-      } catch {}
+      } catch {
+        // Ignore disposal errors
+      }
       this.ptyDataDisposable = null
     }
 
@@ -269,14 +275,18 @@ export class TerminalView extends ItemView {
     if (this.webglAddon) {
       try {
         this.webglAddon.dispose()
-      } catch {}
+      } catch {
+        // Ignore disposal errors
+      }
       this.webglAddon = null
     }
 
     if (this.terminal) {
       try {
         this.terminal.dispose()
-      } catch {}
+      } catch {
+        // Ignore disposal errors
+      }
       this.terminal = null
     }
 
@@ -289,12 +299,12 @@ export class TerminalView extends ItemView {
 
 class NodePtySetupModal extends Modal {
   private installCmd = ""
-  private checkInterval: any = null
+  private checkInterval: NodeJS.Timeout | null = null
 
   constructor(app: App) {
     super(app)
     const pluginDir = getPluginDir(app)
-    const electronVersion = (process.versions as any)?.electron
+    const electronVersion = (process.versions as { electron?: string })?.electron
     const versionPart = electronVersion ? ` --version=${electronVersion}` : ""
     this.installCmd = `cd "${pluginDir}" && npm install -y node-pty && npx --yes electron-rebuild -f -w node-pty${versionPart}`
   }
@@ -304,36 +314,36 @@ class NodePtySetupModal extends Modal {
     contentEl.empty()
 
     contentEl
-      .createEl("h2", { text: "terminal setup is incomplete" })
+      .createEl("h2", { text: "Terminal setup is incomplete" })
       .addClass("node-pty-setup-title")
 
     contentEl.createEl("p", {
-      text: "this terminal view needs the native node-pty module. install it in the plugin folder to enable the terminal.",
+      text: "This terminal view needs the native node-pty module. Install it in the plugin folder to enable the terminal.",
     })
 
     contentEl.createEl("code", { text: this.installCmd, cls: "node-pty-setup-code" })
 
     const buttons = contentEl.createDiv({ cls: "node-pty-setup-buttons" })
 
-    const copyBtn = buttons.createEl("button", { text: "copy command" })
+    const copyBtn = buttons.createEl("button", { text: "Copy command" })
     copyBtn.onclick = async () => {
       try {
         await navigator.clipboard.writeText(this.installCmd)
-        new Notice("install command copied to clipboard")
+        new Notice("Install command copied to clipboard")
       } catch {
-        new Notice("failed to use clipboard. copy the command manually.")
+        new Notice("Failed to use clipboard. Copy the command manually.")
       }
     }
 
-    const whyBtn = buttons.createEl("button", { text: "why?" })
+    const whyBtn = buttons.createEl("button", { text: "Why?" })
 
     const whyEl = contentEl.createDiv({ cls: "node-pty-setup-why" })
 
     whyEl.createEl("p", {
-      text: "node-pty is a native library that gives the terminal real shell i/o. without it, obsidian can't talk to your system shell in a proper pseudo-terminal, so this plugin disables the terminal instead of crashing.",
+      text: "This terminal view needs the native node pty module.",
     })
     whyEl.createEl("p", {
-      text: "install node-pty once in the plugin directory and rebuild the native module. after restarting obsidian, the terminal will work.",
+      text: "Install node-pty once in the plugin directory and rebuild the native module. After restarting Obsidian, the terminal will work.",
     })
 
     whyBtn.onclick = () => {
@@ -348,10 +358,13 @@ class NodePtySetupModal extends Modal {
       const pluginDir = getPluginDir(this.app)
       const ptyPath = path.join(pluginDir, "node_modules", "node-pty")
       try {
+        // eslint-disable-next-line @typescript-eslint/no-require-imports
         require(ptyPath)
-        new Notice("node-pty installed. please restart obsidian to use the terminal.")
+        new Notice("Node-pty installed. Please restart Obsidian to use the terminal.")
         this.close()
-      } catch {}
+      } catch {
+        // Ignore check errors
+      }
     }, 500)
   }
 
