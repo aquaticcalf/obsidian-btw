@@ -1,7 +1,7 @@
 {
   "id": "btw",
   "name": "by the way",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "minAppVersion": "1.0.0",
   "description": "turn your vault into an ide!",
   "author": "aquaticcalf",
