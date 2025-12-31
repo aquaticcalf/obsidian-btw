@@ -9,7 +9,7 @@
     "dev": "bun run build.ts --watch",
     "build": "bun run build.ts",
     "typecheck": "tsc --noEmit",
-    "fix": "oxfmt app build.ts release.ts --write && oxlint app build.ts release.ts --fix",
+    "fix": "oxfmt app build.ts release.ts --write && oxlint app build.ts release.ts --fix && tsc --noEmit",
     "release": "bun run release.ts",
     "prepare": "husky"
   },
