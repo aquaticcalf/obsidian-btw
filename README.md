@@ -18,7 +18,6 @@ this is how it looks right now :
 
 ![opencode](./assets/opencode.png)
 
-
 ### development setup
 
 1. clone this repo into your vault's `.obsidian/plugins/` directory
@@ -27,10 +26,10 @@ this is how it looks right now :
 4. run `bun run build` for production build
 5. enable the plugin in obsidian settings
 
-
 ### release wise new features
 
 [`0.0.1`](https://github.com/aquaticcalf/obsidian-btw/releases/tag/0.0.1)
+
 - [x] terminal
 - [x] tabs for terminal
 - [x] made sure nvim and opencode work
